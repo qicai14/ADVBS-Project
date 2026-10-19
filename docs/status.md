@@ -13,12 +13,13 @@ Next: each member builds their `M#_objects.sql` (constraint, optimisation, SP, t
 
 Decided:
 - Lecturer: each of the 4 members picks one slot; the unpicked slot is dropped.
-- Lim Qi Cai is M1. Teammates use SSMS 22.
+- Slots: M1 Lim Qi Cai, M2 Brosnan, M4 Melvin, M5 Shawn. M3 (rates and services) dropped; its folder removed.
+- Teammates use SSMS 22.
 - Everyone (Lim included) works on branches and merges by PR; Lim approves. `main` is protected.
 - Test-data assumptions (state in report; may change if the logic needs it): money is Malaysian ringgit, shown as RM (`currency_code` keeps ISO `MYR`); no-show = status `Cancelled` + `NO_SHOW` row (not a cancellation); `noshow_charge_pct` is % of the booked room charge; "active" stay = reservation not `Cancelled`.
 
 Open decisions:
-- Which slots M2–M5 the other three pick; names, TP numbers; intake code; lecturer name (cover page).
+- Full names, TP numbers; intake code; lecturer name (cover page). GitHub usernames to invite as collaborators.
 - Lowest SQL Server engine version among teammates (`SELECT @@VERSION;`, not the SSMS version), which sets the T-SQL feature floor.
 - Guests aged 12–17: not adult (rule) and not child (< 12). M2 decides their age category.
 - Each member confirms or replaces their default additional query (`design/design-review.md`, last section).

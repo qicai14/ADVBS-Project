@@ -3,8 +3,8 @@
 Reviewed 2026-10-19 against the brief and the lecture slides (W1 ERD, W6 triggers, W10 optimisation).
 Revised diagram: [erd.md](erd.md).
 
-> **Group size:** the brief is written for 5 members; we have 4. Lecturer: each member picks one
-> slot and the unpicked slot is dropped. The tables keep all 5 until the picks are final.
+> **Group size:** the brief is written for 5 members; we have 4. Lecturer agreed M3 is dropped.
+> Slots: M1 Lim Qi Cai, M2 Brosnan, M4 Melvin, M5 Shawn. M3 rows below are not implemented.
 
 ## 1a. Does the excalidraw ERD support the business requirements?
 
