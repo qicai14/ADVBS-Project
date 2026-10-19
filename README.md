@@ -7,12 +7,11 @@ Each member edits **only their own folder**:
 | Folder | Role | Who |
 |--------|------|-----|
 | `M1_Reservations_Availability/` | Reservations and room availability | Lim Qi Cai |
-| `M2_Guests_Occupancy/` | Guests and room occupancy | TBD |
-| `M3_Rates_Services/` | Room rates and optional services | TBD |
-| `M4_Changes_Cancellations_NoShows/` | Changes, cancellations and no-shows | TBD |
-| `M5_Billing_Payments_Maintenance/` | Billing, payments and maintenance | TBD |
+| `M2_Guests_Occupancy/` | Guests and room occupancy | Brosnan |
+| `M4_Changes_Cancellations_NoShows/` | Changes, cancellations and no-shows | Melvin |
+| `M5_Billing_Payments_Maintenance/` | Billing, payments and maintenance | Shawn |
 
-We are 4, so one role from M2–M5 is not done (lecturer agreed). Tell Lim which role you pick.
+We are 4, so M3 (rates and services) is not done (lecturer agreed).
 
 Your folder has three files (plus `M#_report.md` for your report sections, in Markdown):
 - `M#_objects.sql`: your constraint, optimisation, stored procedure (or function) and trigger.

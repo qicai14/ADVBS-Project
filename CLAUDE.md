@@ -1,6 +1,6 @@
 # GSHG hotel reservation database (APU CT004-3-3 Advanced Database Systems group assignment)
 
-Due 3 Jan 2027. Group of 4; the brief assumes 5 (member slots M1–M5). Each member picks one slot; the unpicked one is dropped (lecturer). Lim Qi Cai is M1.
+Due 3 Jan 2027. Group of 4; the brief assumes 5 (member slots M1–M5). Slots: M1 Lim Qi Cai, M2 Brosnan, M4 Melvin, M5 Shawn; M3 is dropped (lecturer agreed).
 Target is Microsoft SQL Server / T-SQL only. Marking follows what the lectures teach, not general best practice (e.g. "optimisation strategy" = W10 denormalisation).
 
 - Brief: `brief/assignment-brief.md` (text of the `.docx`)
