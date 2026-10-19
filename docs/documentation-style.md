@@ -4,6 +4,7 @@
 - Citations and references: APA 7th edition (in-text author–date, alphabetical reference list).
 - Diagrams: export Mermaid from `design/erd.md` as SVG; caption every figure and table.
 - Drafts are Markdown, reviewed in a PR: a member's sections in `M#_*/M#_report.md`, group sections in `report/`. Copy into the `.docx` only after Lim approves.
+- The master report is on OneDrive, which holds its version history. The `.docx` in `submissions/` is a local working draft: format there, then move the content into the OneDrive copy.
 - Money is Malaysian ringgit, written `RM 1,410.00`.
 - Each member's sections are labelled with their name and slot (M1–M5) so individual marks can be traced.
 

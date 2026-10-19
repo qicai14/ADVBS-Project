@@ -10,7 +10,7 @@ Target is Microsoft SQL Server / T-SQL only. Marking follows what the lectures t
 - Writing the report: `docs/documentation-style.md`
 - Writing SQL: `docs/sql-conventions.md`
 - Team guide (who edits what, run order): `README.md`
-- Deliverables: `submissions/`
+- Deliverables: `submissions/`. The master report lives on OneDrive (hosting and version history); the local `.docx` is only a working draft.
 - Commits: no `Co-Authored-By` or other Claude attribution lines.
 
 Ownership:
