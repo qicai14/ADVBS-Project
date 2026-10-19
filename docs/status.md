@@ -6,13 +6,21 @@ Done:
 - Design reviewed and fixed; group agreed to all fixes (`design/design-review.md`, `design/erd.md`, SVG exports in `design/`).
 - 1b and 1c allocated per member slot (tables in `design/design-review.md`).
 - Report scaffold: `submissions/ADVBS Group Assignment - Documentation.docx` (headings, placeholders, all 35 queries, workload matrix, APA references).
+- `sql/01_tables.sql` (21 tables, keys, defaults) and `sql/02_data.sql` (test data; scenario list in its header). Both run clean on SQL Server 2022 CU27; every 1c CHECK constraint accepts the data.
+- Member folders `M1_…` to `M5_…` with starter files; team guide in `README.md`.
 
-Next: implementation SQL in `sql/` (tables, test data, then each member's constraint, SP, trigger, optimisation, queries).
+Next: each member builds their `M#_objects.sql` (constraint, optimisation, SP, trigger), then queries and tests.
+
+Decided:
+- Lecturer: each of the 4 members picks one slot; the unpicked slot is dropped.
+- Lim Qi Cai is M1. Teammates use SSMS 22.
+- Everyone (Lim included) works on branches and merges by PR; Lim approves. `main` is protected.
+- Test-data assumptions (state in report; may change if the logic needs it): money is Malaysian ringgit, shown as RM (`currency_code` keeps ISO `MYR`); no-show = status `Cancelled` + `NO_SHOW` row (not a cancellation); `noshow_charge_pct` is % of the booked room charge; "active" stay = reservation not `Cancelled`.
 
 Open decisions:
-- Lecturer: is M5 (billing, payments, maintenance) dropped or shared, given a group of 4?
-- Member names, TP numbers and slot assignment; intake code; lecturer name (cover page).
-- Lowest SQL Server version among teammates (`SELECT @@VERSION;`), which sets the T-SQL feature floor.
+- Which slots M2–M5 the other three pick; names, TP numbers; intake code; lecturer name (cover page).
+- Lowest SQL Server engine version among teammates (`SELECT @@VERSION;`, not the SSMS version), which sets the T-SQL feature floor.
+- Guests aged 12–17: not adult (rule) and not child (< 12). M2 decides their age category.
 - Each member confirms or replaces their default additional query (`design/design-review.md`, last section).
 
-Environment: teammates use SSMS on Windows; one member uses a Mac with VS Code + MSSQL extension and SQL Server in Docker (amd64 image under Rosetta, which Microsoft does not support but which generally works).
+Environment: teammates use SSMS 22 on Windows. Lim uses a Mac: VS Code + MSSQL extension, SQL Server 2022 in Docker (`docker-compose.yml`, amd64 image under Rosetta, which Microsoft does not support but which works; SA password in gitignored `.env`).

@@ -6,3 +6,5 @@
 Thumbs.db
 # Local Claude settings
 .claude/settings.local.json
+# Local secrets (SA password)
+.env

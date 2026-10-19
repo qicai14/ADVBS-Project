@@ -1,6 +1,6 @@
 # GSHG hotel reservation database (APU CT004-3-3 Advanced Database Systems group assignment)
 
-Due 3 Jan 2027. Group of 4; the brief assumes 5 (member slots M1–M5).
+Due 3 Jan 2027. Group of 4; the brief assumes 5 (member slots M1–M5). Each member picks one slot; the unpicked one is dropped (lecturer). Lim Qi Cai is M1.
 Target is Microsoft SQL Server / T-SQL only. Marking follows what the lectures teach, not general best practice (e.g. "optimisation strategy" = W10 denormalisation).
 
 - Brief: `brief/assignment-brief.md` (text of the `.docx`)
@@ -9,5 +9,16 @@ Target is Microsoft SQL Server / T-SQL only. Marking follows what the lectures t
 - Current state and open decisions: `docs/status.md`
 - Writing the report: `docs/documentation-style.md`
 - Writing SQL: `docs/sql-conventions.md`
+- Team guide (who edits what, run order): `README.md`
 - Deliverables: `submissions/`
 - Commits: no `Co-Authored-By` or other Claude attribution lines.
+
+Ownership:
+- Only Lim Qi Cai (git user `LIM QI CAI`) edits the directive files (`CLAUDE.md`, `README.md`, `docs/`, `design/`, `.github/`, `.claude/`) and the shared scripts in `sql/`. For anyone else, do not edit them; suggest the change for Lim instead. Keep them lean.
+- Every other member edits only their own `M#_*` folder.
+- Everyone, Lim included, works on their own branch and merges to `main` only by a pull request with no conflicts; Lim approves. Never commit or push to `main`.
+
+Delegation (the main session plans, writes the SQL and reviews; agents in `.claude/agents/`):
+- `chore` (Haiku, low effort): searches, file listings, renames, moves, find-and-replace, running a script and reporting the output.
+- `doc-writer`: all report prose, so drafts stay out of the main context. Brief it with section, owner slot, sources and where to save.
+- Everything needing judgement (design, SQL logic, reviewing results) stays in the main session.

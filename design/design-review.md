@@ -3,9 +3,8 @@
 Reviewed 2026-10-19 against the brief and the lecture slides (W1 ERD, W6 triggers, W10 optimisation).
 Revised diagram: [erd.md](erd.md).
 
-> **Group size:** the brief is written for **5 members** (5 query sets, "each of the five members"
-> for 1b/1c). We have 4. Ask the lecturer whether slot M5 (Billing, payments, maintenance) is
-> dropped or shared before splitting work. The tables below keep 5 slots so nothing is lost.
+> **Group size:** the brief is written for 5 members; we have 4. Lecturer: each member picks one
+> slot and the unpicked slot is dropped. The tables keep all 5 until the picks are final.
 
 ## 1a. Does the excalidraw ERD support the business requirements?
 

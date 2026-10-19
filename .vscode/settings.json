@@ -1,0 +1,18 @@
+{
+    // Mac + Docker only. Password is asked on first connect (value is in .env), then kept in the macOS keychain.
+    "mssql.connections": [
+        {
+            "profileName": "GSHG (Docker)",
+            "server": "localhost,1433",
+            "database": "GSHG",
+            "authenticationType": "SqlLogin",
+            "user": "sa",
+            "password": "",
+            "savePassword": true,
+            "encrypt": "Mandatory",
+            "trustServerCertificate": true,
+            "groupId": "ROOT",
+            "id": "e8879146-c941-4231-abec-91d00bfc554b"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+# Mac only (Docker Desktop). Windows teammates use their local SQL Server + SSMS instead.
+# SA password comes from .env (gitignored): MSSQL_SA_PASSWORD=...
+# Start: docker compose up -d    Stop: docker compose stop
+services:
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: gshg-sql
+    hostname: gshg-sql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?set MSSQL_SA_PASSWORD in .env}
+      MSSQL_PID: Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - gshg-sql-data:/var/opt/mssql
+    restart: unless-stopped
+
+volumes:
+  gshg-sql-data:

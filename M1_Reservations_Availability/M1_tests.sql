@@ -1,0 +1,15 @@
+/* =====================================================================
+   M1_tests.sql  -  demo of M1's procedure, trigger and constraint
+   Owner: M1 Lim Qi Cai - Reservations and room availability
+   Run after sql/01_tables.sql and sql/02_data.sql.
+   Run after M1_objects.sql. Wrap each test in BEGIN TRAN ... ROLLBACK
+   so the test data stays unchanged for everyone else.
+   ===================================================================== */
+
+USE GSHG;
+GO
+
+-- Test 1: valid call succeeds
+
+-- Test 2: rule violation is rejected (trigger / constraint error expected)
+
