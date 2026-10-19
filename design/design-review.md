@@ -65,3 +65,17 @@ Notes:
   Function alternative for M2: `fn_AgeCategory(dob, on_date)`.
 - W6: cross-table rules must be triggers (CHECK sees only its own row), which is why the overlap,
   occupancy and maintenance rules are triggers, not constraints.
+
+## Open-ended choices (defaults until a member picks otherwise)
+
+The brief asks for no special features. Its only open-ended items are each member's "one additional query" and the choice of SP or function.
+
+| Slot | Additional query (default) | Why it's useful |
+|------|----------------------------|-----------------|
+| M1 | Occupancy rate by hotel and month for a year: room-nights sold ÷ room-nights available (rooms × days, minus maintenance days) | Core demand KPI; reuses the availability logic |
+| M2 | Average occupants per stay by room category compared with `max_occupancy` | Shows whether categories are over- or under-sized |
+| M3 | Service attach rate per hotel: % of reservations with at least one optional service | Shows which hotels upsell services |
+| M4 | Average lead time (days between `created_at` and `cancelled_at`) and share of late (< 48 h) cancellations per hotel | Supports the 48-hour policy decision |
+| M5 | Room-nights lost to maintenance per hotel in a period, with average maintenance duration | Ties maintenance to lost revenue |
+
+Other defaults: `BILL.discount` is a parameter supplied at check-out (no promotions table; the 10% Deluxe promotion is a calculated column in M3's query). Each member's 1c stored procedure also serves as their implementation-section T-SQL feature.
