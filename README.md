@@ -28,7 +28,7 @@ Everything outside your folder. If something there is wrong or missing (a table,
 
 1. Open and run `sql/01_tables.sql` (creates the `GSHG` database from scratch).
 2. Run `sql/02_data.sql` (test data; the header lists every test scenario).
-3. Run your own `M#_objects.sql`, then your queries and tests.
+3. Run `M1_Reservations_Availability/M1_objects.sql` (it adds a column your scripts may rely on), then your own `M#_objects.sql`, then your queries and tests.
 
 Rerun steps 1–2 any time to get a clean database.
 
