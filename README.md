@@ -30,7 +30,7 @@ Everything outside your folder. If something there is wrong or missing (a table,
 2. Run `sql/02_data.sql` (test data; the header lists every test scenario).
 3. Run `M1_Reservations_Availability/M1_objects.sql` (it adds a column your scripts may rely on), then your own `M#_objects.sql`, then your queries and tests.
 
-Rerun steps 1–2 any time to get a clean database.
+Rerun steps 1–3 any time to get a clean database.
 
 ## Saving your work (Git)
 
