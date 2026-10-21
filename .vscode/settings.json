@@ -12,7 +12,9 @@
             "encrypt": "Mandatory",
             "trustServerCertificate": true,
             "groupId": "ROOT",
-            "id": "e8879146-c941-4231-abec-91d00bfc554b"
+            "id": "e8879146-c941-4231-abec-91d00bfc554b",
+            "profileSource": 0,
+            "containerName": "gshg-sql"
         }
     ]
 }
