@@ -6,7 +6,7 @@
 - Every member's constraint, procedure and trigger starts with a comment: owner slot (M1–M5) and the business rule it enforces.
 - Scripts must run unchanged in SSMS (team, Windows) and VS Code + MSSQL extension against SQL Server in Docker (Mac): no file paths in `CREATE DATABASE`, no SQLCMD-mode commands, batches split with `GO`.
 - Lowest SQL Server version in the team: TBD. Until confirmed, avoid 2022+ functions (`GREATEST`, `LEAST`, `DATETRUNC`, `GENERATE_SERIES`).
-- Run order: `sql/01_tables.sql` (rebuilds the database from scratch), `sql/02_data.sql`, then each member's `M#_*/M#_objects.sql`, then their queries and tests.
+- Run order: `sql/01_tables.sql` (rebuilds the database from scratch), `sql/02_data.sql`, then `M1_*/M1_objects.sql` (it adds `STAY.hotel_id`), then the other members' `M#_objects.sql`, then queries and tests.
 - Member scripts are rerunnable: `CREATE OR ALTER` for procedures, functions and triggers; `DROP CONSTRAINT IF EXISTS` before adding a constraint.
 - Tests that insert or change data run inside `BEGIN TRAN … ROLLBACK` so the shared test data stays the same.
 - ASCII only in `.sql` files (SSMS may misread other characters).
