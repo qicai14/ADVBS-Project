@@ -104,10 +104,13 @@ GO
             @rooms (one row per room: room_id or category_id, check-in,
             check-out, accessible_requested)
    Output : @reservation_id (NULL on failure); return code 0 = success.
+   Transactions: the procedure owns its transaction. If it is called
+            inside a caller's transaction and fails, the whole transaction
+            is rolled back (SQL Server also ends it when a trigger rolls back).
    Tables : inserts RESERVATION (status Pending), STAY, STAY_NIGHT
             (one row per night, priced from ROOM_RATE at booking time).
    Checks : hotel, booker and rate plan exist; at least one room;
-            check-out after check-in; at most 60 nights; room belongs to
+            at least one night per room; at most 60 nights; room belongs to
             the hotel and matches the requested category; an accessible
             request gets an accessible room; every night has a rate.
             Overlaps and maintenance clashes are rejected by the STAY
@@ -153,8 +156,9 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM @rooms)
     BEGIN RAISERROR('A reservation needs at least one room.', 16, 1); RETURN 1; END;
 
-    IF EXISTS (SELECT 1 FROM @rooms WHERE checkout <= checkin)
-    BEGIN RAISERROR('Check-out must be after check-in for every room.', 16, 1); RETURN 1; END;
+    -- At least one night: a same-day 14:00-18:00 booking would have no night to price.
+    IF EXISTS (SELECT 1 FROM @rooms WHERE CAST(checkout AS DATE) <= CAST(checkin AS DATE))
+    BEGIN RAISERROR('Each room must be booked for at least one night (check-out on a later date than check-in).', 16, 1); RETURN 1; END;
 
     IF EXISTS (SELECT 1 FROM @rooms
                WHERE DATEDIFF(DAY, CAST(checkin AS DATE), CAST(checkout AS DATE)) > 60)
@@ -190,9 +194,10 @@ BEGIN
         FROM   @rooms rq
         LEFT JOIN ROOM rm ON rm.room_id = rq.room_id
         CROSS APPLY (SELECT TOP (DATEDIFF(DAY, CAST(rq.checkin AS DATE), CAST(rq.checkout AS DATE)))
-                            DATEADD(DAY, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1, CAST(rq.checkin AS DATE)) AS night_date
+                            DATEADD(DAY, ROW_NUMBER() OVER (ORDER BY a.n, b.n) - 1, CAST(rq.checkin AS DATE)) AS night_date
                      FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7)) a (n)
-                     CROSS JOIN (VALUES (0),(1),(2),(3),(4),(5),(6),(7)) b (n)) AS d
+                     CROSS JOIN (VALUES (0),(1),(2),(3),(4),(5),(6),(7)) b (n)
+                     ORDER BY a.n, b.n) AS d
         WHERE NOT EXISTS (SELECT 1 FROM ROOM_RATE rr
                           WHERE rr.hotel_id     = @hotel_id
                             AND rr.category_id  = COALESCE(rq.category_id, rm.category_id)
@@ -220,9 +225,10 @@ BEGIN
         SELECT s.stay_id, d.night_date, rr.nightly_rate
         FROM   STAY s
         CROSS APPLY (SELECT TOP (DATEDIFF(DAY, CAST(s.scheduled_checkin AS DATE), CAST(s.scheduled_checkout AS DATE)))
-                            DATEADD(DAY, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1, CAST(s.scheduled_checkin AS DATE)) AS night_date
+                            DATEADD(DAY, ROW_NUMBER() OVER (ORDER BY a.n, b.n) - 1, CAST(s.scheduled_checkin AS DATE)) AS night_date
                      FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7)) a (n)
-                     CROSS JOIN (VALUES (0),(1),(2),(3),(4),(5),(6),(7)) b (n)) AS d
+                     CROSS JOIN (VALUES (0),(1),(2),(3),(4),(5),(6),(7)) b (n)
+                     ORDER BY a.n, b.n) AS d
         JOIN   ROOM_RATE rr ON rr.hotel_id     = @hotel_id
                            AND rr.category_id  = s.category_id
                            AND rr.rate_plan_id = @rate_plan_id
@@ -252,7 +258,9 @@ GO
    reservation or hotel change. Works on the whole inserted set (multi-row safe),
    and because it is AFTER, STAY already holds the new rows, so two new
    rows in the same statement are also checked against each other.
-   On violation: RAISERROR + ROLLBACK TRANSACTION (W6 pattern).
+   On violation: ROLLBACK TRANSACTION, then RAISERROR (W6 pattern). The
+   rollback comes first so it always runs: if the caller wraps the
+   statement in TRY/CATCH, RAISERROR jumps straight to the CATCH block.
    ===================================================================== */
 
 CREATE OR ALTER TRIGGER trg_Stay_NoOverlap
@@ -280,9 +288,9 @@ BEGIN
 
     IF @room_no IS NOT NULL
     BEGIN
+        ROLLBACK TRANSACTION;
         RAISERROR('Room %s (%s) is not a room of %s, the hotel of this reservation.', 16, 1,
                   @room_no, @room_hotel, @hotel);
-        ROLLBACK TRANSACTION;
         RETURN;
     END;
 
@@ -303,9 +311,9 @@ BEGIN
 
     IF @other_stay IS NOT NULL
     BEGIN
+        ROLLBACK TRANSACTION;
         RAISERROR('Room %s at %s is already booked from %s to %s (stay %d).', 16, 1,
                   @room_no, @hotel, @from, @to, @other_stay);
-        ROLLBACK TRANSACTION;
         RETURN;
     END;
 END;
@@ -323,7 +331,9 @@ GO
    Works on the whole inserted/deleted set; because it is AFTER, two
    reservations re-activated in one statement are checked against each
    other too. Maintenance clashes on re-activation are M5's rule.
-   On violation: RAISERROR + ROLLBACK TRANSACTION (W6 pattern).
+   On violation: ROLLBACK TRANSACTION, then RAISERROR (W6 pattern). The
+   rollback comes first so it always runs: if the caller wraps the
+   statement in TRY/CATCH, RAISERROR jumps straight to the CATCH block.
    ===================================================================== */
 
 CREATE OR ALTER TRIGGER trg_Reservation_NoOverlapOnReactivate
@@ -356,9 +366,9 @@ BEGIN
 
     IF @other_stay IS NOT NULL
     BEGIN
+        ROLLBACK TRANSACTION;
         RAISERROR('Reservation %d cannot be re-activated: room %s at %s is already booked from %s to %s (stay %d).',
                   16, 1, @reservation, @room_no, @hotel, @from, @to, @other_stay);
-        ROLLBACK TRANSACTION;
         RETURN;
     END;
 END;

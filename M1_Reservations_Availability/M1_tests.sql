@@ -215,20 +215,24 @@ GO
 
 /* ---------- Test 11: procedure input checks ----------
    Wrong-hotel room, category mismatch, accessible request on a
-   non-accessible room: each rejected with its own message. */
+   non-accessible room, same-day stay with no night: each rejected
+   with its own message. */
 DECLARE @passes INT = 0;
-DECLARE @rooms1 dbo.StayRequest, @rooms2 dbo.StayRequest, @rooms3 dbo.StayRequest, @rid INT;
+DECLARE @rooms1 dbo.StayRequest, @rooms2 dbo.StayRequest, @rooms3 dbo.StayRequest, @rooms4 dbo.StayRequest, @rid INT;
 INSERT INTO @rooms1 (room_id, checkin, checkout) VALUES (10, '2027-05-01 14:00', '2027-05-02 12:00');
 INSERT INTO @rooms2 (room_id, category_id, checkin, checkout) VALUES (1, 4, '2027-05-01 14:00', '2027-05-02 12:00');
 INSERT INTO @rooms3 (room_id, checkin, checkout, accessible_requested) VALUES (1, '2027-05-01 14:00', '2027-05-02 12:00', 1);
+INSERT INTO @rooms4 (room_id, checkin, checkout) VALUES (1, '2027-05-01 14:00', '2027-05-01 18:00');
 BEGIN TRY EXEC usp_CreateReservation 1, 24, 1, @rooms1, @rid OUTPUT; END TRY
 BEGIN CATCH IF ERROR_MESSAGE() LIKE '%is not a room of hotel%' SET @passes += 1; END CATCH;
 BEGIN TRY EXEC usp_CreateReservation 1, 24, 1, @rooms2, @rid OUTPUT; END TRY
 BEGIN CATCH IF ERROR_MESSAGE() LIKE '%requested category%' SET @passes += 1; END CATCH;
 BEGIN TRY EXEC usp_CreateReservation 1, 24, 1, @rooms3, @rid OUTPUT; END TRY
 BEGIN CATCH IF ERROR_MESSAGE() LIKE '%not accessible%' SET @passes += 1; END CATCH;
-IF @passes = 3 PRINT 'PASS 11 procedure input checks (wrong hotel, wrong category, not accessible)';
-ELSE PRINT 'FAIL 11 only ' + CAST(@passes AS VARCHAR(2)) + ' of 3 input checks fired';
+BEGIN TRY EXEC usp_CreateReservation 1, 24, 1, @rooms4, @rid OUTPUT; END TRY
+BEGIN CATCH IF ERROR_MESSAGE() LIKE '%at least one night%' SET @passes += 1; END CATCH;
+IF @passes = 4 PRINT 'PASS 11 procedure input checks (wrong hotel, wrong category, not accessible, same-day stay)';
+ELSE PRINT 'FAIL 11 only ' + CAST(@passes AS VARCHAR(2)) + ' of 4 input checks fired';
 GO
 
 /* ---------- Test 12: hotel_id copy kept in sync (W10 optimisation) ----------
@@ -295,5 +299,26 @@ END TRY
 BEGIN CATCH
     PRINT 'FAIL 13b rejected: ' + ERROR_MESSAGE();
 END CATCH;
+IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+GO
+
+/* ---------- Test 14: the trigger's rollback always runs ----------
+   A caller catches the overlap error but does NOT roll back itself.
+   Because the trigger rolls back before raising the error, the
+   transaction is already closed and the overlapping row is gone, so a
+   careless caller cannot keep (or later commit) a double booking. */
+DECLARE @before INT = (SELECT COUNT(*) FROM STAY);
+BEGIN TRANSACTION;
+BEGIN TRY
+    INSERT INTO STAY (reservation_id, room_id, category_id, scheduled_checkin, scheduled_checkout)
+    VALUES (1020, 3, 2, '2027-02-11 14:00', '2027-02-13 12:00');   -- overlaps 1019
+END TRY
+BEGIN CATCH
+    -- deliberately no ROLLBACK here
+END CATCH;
+IF @@TRANCOUNT = 0 AND (SELECT COUNT(*) FROM STAY) = @before
+    PRINT 'PASS 14 trigger rolled back even though the caller caught the error';
+ELSE
+    PRINT 'FAIL 14 open transactions: ' + CAST(@@TRANCOUNT AS VARCHAR(5));
 IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
 GO
