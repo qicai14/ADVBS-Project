@@ -1,0 +1,216 @@
+[
+  {
+    "slot": "C1",
+    "claim": "Denormalisation as a physical-design/performance technique (duplicating FK attributes in 1:* relationships to reduce joins; faster reads, slower updates).",
+    "sources": [
+      {
+        "apa": "Connolly, T., & Begg, C. (2015). Database systems: A practical approach to design, implementation, and management (6th ed.). Pearson.",
+        "in_text": "(Connolly & Begg, 2015)",
+        "year": 2015,
+        "doi": "ISBN 978-0-13-294326-0 (Pearson, 6th ed.; global edition ISBN 978-1-292-06118-4)",
+        "verified_via": "Open Library (ISBN lookup: title, authors Thomas Connolly and Carolyn Begg, Pearson, 2014/2015, 1440 pp.). Not in Crossref. Page/chapter numbers not verified: check the physical copy.",
+        "supports": "Textbook source of the DreamHome branch-number-on-property example and the list of denormalisation strategies (duplicate FKs in 1:*), and of the statement that denormalisation complicates implementation and speeds retrieval while slowing updates.",
+        "older_than_5y_reason": "Textbook; 6th ed. is the most recent edition found (no 7th edition located). It is the source of the DreamHome example and the denormalisation strategies named in the claim.",
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=Database+Systems%3A+A+Practical+Approach+to+Design%2C+Implementation%2C+and+Management+Connolly+Begg"
+      },
+      {
+        "apa": "Ajayi, W., Okesola, K. I., Nteziryayo, D., Odo, C., & Akpan, U. (2025). Relational database normalization vs denormalization: A performance perceptive. Asian Journal of Electrical Sciences, 14(2), 53-66. https://doi.org/10.70112/ajes-2025.14.2.4291",
+        "in_text": "(Ajayi et al., 2025)",
+        "year": 2025,
+        "doi": "https://doi.org/10.70112/ajes-2025.14.2.4291",
+        "verified_via": "Crossref and OpenAlex (title, 5 authors, year, journal, volume/issue/pages match)",
+        "supports": "Abstract: normalization simplifies updates but can slow queries through joins; denormalization improves performance by reducing joins at the cost of redundancy; tested on SQL Server with benchmarks.",
+        "older_than_5y_reason": null,
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=Relational+Database+Normalization+vs+Denormalization%3A+A+Performance+Perceptive"
+      }
+    ],
+    "notes": "Two main sources: Connolly & Begg plus Ajayi et al. (SQL Server, matches the project). Mendonça et al. is optional and contradicts the 'faster reads' assumption in a PostgreSQL row-store full-flattening setup, so cite only if you add a caveat. The exact sentences in the claim are textbook paraphrase; verify page numbers in the book.",
+    "main_session_decision": "Kept Connolly & Begg (2015) + Ajayi et al. (2025). Dropped Mendonca et al. (2026): its results contradict \"faster reads\"."
+  },
+  {
+    "slot": "C2",
+    "claim": "A transitive dependency (stay_id -> reservation_id -> hotel_id) means the table is no longer in 3NF.",
+    "sources": [
+      {
+        "apa": "Connolly, T., & Begg, C. (2015). Database systems: A practical approach to design, implementation, and management (6th ed.). Pearson.",
+        "in_text": "(Connolly & Begg, 2015)",
+        "year": 2015,
+        "doi": "ISBN 978-0-13-294326-0 (Pearson, 6th ed.; global edition ISBN 978-1-292-06118-4)",
+        "verified_via": "Open Library (ISBN lookup: title, authors Thomas Connolly and Carolyn Begg, Pearson, 2014/2015, 1440 pp.). Not in Crossref. Page/chapter numbers not verified: check the physical copy.",
+        "supports": "Textbook definition of normal forms: 3NF removes transitive dependencies of non-key attributes on the primary key (normalization chapter; chapter/page not verified).",
+        "older_than_5y_reason": "Textbook; 6th ed. is the most recent edition found (no 7th edition located). It is the source of the DreamHome example and the denormalisation strategies named in the claim.",
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=Database+Systems%3A+A+Practical+Approach+to+Design%2C+Implementation%2C+and+Management+Connolly+Begg"
+      }
+    ],
+    "notes": "No recent peer-reviewed paper found whose abstract states the 3NF/transitive dependency definition; the textbook is the right source for that. Wei & Link is supplementary only. Check chapter and page in the book.",
+    "main_session_decision": "Kept Connolly & Begg (2015). Dropped Wei & Link (2025): abstract does not state 3NF."
+  },
+  {
+    "slot": "C3",
+    "claim": "CHECK constraints reference only the row's own columns; rules spanning rows/tables need triggers (integrity constraints vs triggers / active database rules).",
+    "sources": [
+      {
+        "apa": "Connolly, T., & Begg, C. (2015). Database systems: A practical approach to design, implementation, and management (6th ed.). Pearson.",
+        "in_text": "(Connolly & Begg, 2015)",
+        "year": 2015,
+        "doi": "ISBN 978-0-13-294326-0 (Pearson, 6th ed.; global edition ISBN 978-1-292-06118-4)",
+        "verified_via": "Open Library (ISBN lookup: title, authors Thomas Connolly and Carolyn Begg, Pearson, 2014/2015, 1440 pp.). Not in Crossref. Page/chapter numbers not verified: check the physical copy.",
+        "supports": "SQL integrity constraints (CHECK) and triggers; confirm chapter in the book",
+        "older_than_5y_reason": "Textbook; 6th ed. is the most recent edition found (no 7th edition located). It is the source of the DreamHome example and the denormalisation strategies named in the claim.",
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=Database+Systems%3A+A+Practical+Approach+to+Design%2C+Implementation%2C+and+Management+Connolly+Begg"
+      },
+      {
+        "apa": "Paton, N. W., & Díaz, O. (1999). Active database systems. ACM Computing Surveys, 31(1), 63-103. https://doi.org/10.1145/311531.311623",
+        "in_text": "(Paton & Díaz, 1999)",
+        "year": 1999,
+        "doi": "https://doi.org/10.1145/311531.311623",
+        "verified_via": "Crossref and OpenAlex (title, authors, year, journal, volume/issue/pages match)",
+        "supports": "Survey of active database systems (event-condition-action rules/triggers that respond automatically to database events). Supports triggers as the active-rule mechanism; does not itself state the CHECK single-row limitation.",
+        "older_than_5y_reason": "Foundational survey of active database rules; no 2021+ source found that covers the concept as well.",
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=Active+database+systems+Paton+D%C3%ADaz"
+      }
+    ],
+    "notes": "No academic source found that explicitly states that SQL CHECK constraints are limited to the same row; that is SQL Server behaviour. Fallback (vendor, not verified here, so not listed): Microsoft Learn page 'Unique constraints and check constraints'. Connolly & Begg (ISBN above) also covers integrity constraints and triggers and could be cited for this too.",
+    "main_session_decision": "Kept Connolly & Begg (2015) + Paton & Diaz (1999). Dropped de Brock (2023): abstract unread (paywalled)."
+  },
+  {
+    "slot": "C4",
+    "claim": "Rolling back in an AFTER trigger is expensive since data is changed twice; a table allows only one INSTEAD OF trigger per action; IF UPDATE(column) limits the check to changed columns.",
+    "sources": [
+      {
+        "apa": "Microsoft. (n.d.). CREATE TRIGGER (Transact-SQL) - SQL Server. Microsoft Learn. https://learn.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql",
+        "in_text": "(Microsoft, n.d.)",
+        "year": null,
+        "doi": null,
+        "url": "https://learn.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql",
+        "verified_via": "Direct fetch of the Microsoft Learn page (no DOI); page ms.date 2025-09-26",
+        "supports": "States 'At most, you can define one INSTEAD OF trigger per INSERT, UPDATE, or DELETE statement on a table or view'; states UPDATE() tests for UPDATE or INSERT attempts on one column (COLUMNS_UPDATED for several); AFTER trigger runs only after the triggering statement has succeeded; example C uses AFTER INSERT with ROLLBACK.",
+        "older_than_5y_reason": null,
+        "vendor_fallback": true,
+        "scholar_link": "https://scholar.google.com/scholar?q=CREATE+TRIGGER+%28Transact-SQL%29+-+SQL+Server+Microsoft+Learn"
+      }
+    ],
+    "notes": "No academic source found stating SQL Server-specific trigger rules, so vendor fallback. The page does NOT state the sentence 'rolling back in an AFTER trigger is expensive since the data is changed twice'; it only says AFTER triggers fire after the statement has succeeded (so a ROLLBACK undoes work already done) and that triggers hold locks until commit/rollback. Treat the 'expensive' wording as the report's own inference, or soften it. Page applies to SQL Server 2017-2025.",
+    "main_session_decision": "Vendor fallback only (Microsoft Learn). \"AFTER rollback is expensive\" sentence to lose its citation."
+  },
+  {
+    "slot": "C5",
+    "claim": "Shared application logic, a hidden schema and less network traffic are the usual reasons for using procedures (performance, security, reuse).",
+    "sources": [
+      {
+        "apa": "Hartono, N., & Erfina, E. (2021). Comparison of stored procedures on relational database management system. Tech-E, 4(2), 8-15. https://doi.org/10.31253/te.v4i2.529",
+        "in_text": "(Hartono & Erfina, 2021)",
+        "year": 2021,
+        "doi": "https://doi.org/10.31253/te.v4i2.529",
+        "verified_via": "Crossref and OpenAlex (title, authors, year, journal, volume, issue, pages match)",
+        "supports": "Abstract: a stored procedure is a group of queries kept in the database catalogue and recalled; it is an alternative to optimise query performance and to reduce the security gap at interface level. Covers performance and security; reuse is implied by 'recalled' but not stated.",
+        "older_than_5y_reason": null,
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=Comparison+of+Stored+Procedures+on+Relational+Database+Management+System"
+      }
+    ],
+    "notes": "Only verified from the abstract (full text not read). Modest venue (Indonesian journal Tech-E), experimental on MariaDB/PostgreSQL, not SQL Server. Does not mention network traffic. If Lim wants stronger support, a textbook (e.g. Coronel & Morris, Database Systems) would cover all three; Crossref could not verify it, so not included.",
+    "main_session_decision": "Weak source (MariaDB/PostgreSQL study); \"less network traffic\" not supported, reword."
+  },
+  {
+    "slot": "C6",
+    "claim": "In SQL Server a function cannot insert into tables (UDFs cannot modify database state); functions cannot have output parameters; procedure uses a table-valued parameter.",
+    "sources": [
+      {
+        "apa": "Microsoft. (n.d.). CREATE FUNCTION (Transact-SQL) - SQL Server. Microsoft Learn. https://learn.microsoft.com/en-us/sql/t-sql/statements/create-function-transact-sql",
+        "in_text": "(Microsoft, n.d.)",
+        "year": null,
+        "doi": null,
+        "url": "https://learn.microsoft.com/en-us/sql/t-sql/statements/create-function-transact-sql",
+        "verified_via": "Direct fetch of the Microsoft Learn page (no DOI); page ms.date 2025-11-03",
+        "supports": "Limitations section: 'User-defined functions can't be used to perform actions that modify the database state'; function_body must not produce side effects such as modifying a table; INSERT/UPDATE/DELETE allowed only on local table variables; READONLY is required for user-defined table type (TVP) parameters.",
+        "older_than_5y_reason": null,
+        "vendor_fallback": true,
+        "scholar_link": "https://scholar.google.com/scholar?q=CREATE+FUNCTION+%28Transact-SQL%29+-+SQL+Server+Microsoft+Learn"
+      }
+    ],
+    "notes": "No academic source found, so vendor fallback. The page does not literally say 'functions cannot have output parameters'; the function syntax simply has no OUTPUT option for parameters and the only parameter modifier is READONLY. Cite it for the side-effect rule and TVP READONLY; the output-parameter point is an inference from the syntax. Page applies to SQL Server 2017-2025.",
+    "main_session_decision": "Vendor fallback only (Microsoft Learn)."
+  },
+  {
+    "slot": "C7",
+    "claim": "Atomicity is the 'all or nothing' property of a transaction (ACID)",
+    "sources": [
+      {
+        "apa": "Haerder, T., & Reuter, A. (1983). Principles of transaction-oriented database recovery. ACM Computing Surveys, 15(4), 287-317. https://doi.org/10.1145/289.291",
+        "in_text": "(Haerder & Reuter, 1983)",
+        "year": 1983,
+        "doi": "https://doi.org/10.1145/289.291",
+        "verified_via": "Crossref",
+        "supports": "Original paper that names and defines the ACID properties, including atomicity as a transaction executed completely or not at all.",
+        "older_than_5y_reason": "Foundational: coined the ACID acronym. OpenAlex search for 2021+ surveys returned only blockchain, data-lake or NoSQL papers that do not define atomicity authoritatively.",
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=Principles+of+transaction-oriented+database+recovery"
+      }
+    ],
+    "notes": "Definition of atomicity is from the paper's transaction-paradigm section; confirm the exact wording against the full text before quoting.",
+    "main_session_decision": "Foundational 1983 paper (5-year exception)."
+  },
+  {
+    "slot": "C8",
+    "claim": "Exclusive locks held until commit; locking does not prevent deadlocks (2PL)",
+    "sources": [
+      {
+        "apa": "Eswaran, K. P., Gray, J. N., Lorie, R. A., & Traiger, I. L. (1976). The notions of consistency and predicate locks in a database system. Communications of the ACM, 19(11), 624-633. https://doi.org/10.1145/360363.360369",
+        "in_text": "(Eswaran et al., 1976)",
+        "year": 1976,
+        "doi": "https://doi.org/10.1145/360363.360369",
+        "verified_via": "Crossref",
+        "supports": "Introduces two-phase locking as the rule that guarantees consistent (serialisable) schedules, and discusses deadlock as a consequence of locking.",
+        "older_than_5y_reason": "Foundational: original two-phase locking paper. Recent hits (2021-2025) were narrow protocol or niche-journal papers, not general statements of the claim.",
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=The+notions+of+consistency+and+predicate+locks+in+a+database+system"
+      }
+    ],
+    "notes": "Strict 2PL (hold exclusive locks to commit) is a later refinement; Eswaran et al. states 2PL itself. Optional recent alternative of lower quality: Kafr El-Sheikh J. Inf. Sci. 2022 review, doi 10.21608/kjis.2022.246104 (not verified in detail, not recommended).",
+    "main_session_decision": "Foundational 1976 paper (5-year exception); cite for locking and deadlock, not strict 2PL."
+  },
+  {
+    "slot": "C9",
+    "claim": "GROUP BY ROLLUP produces detail rows, subtotal per hotel and grand total",
+    "sources": [
+      {
+        "apa": "Gray, J., Chaudhuri, S., Bosworth, A., Layman, A., Reichart, D., Venkatrao, M., Pellow, F., & Pirahesh, H. (1997). Data cube: A relational aggregation operator generalizing group-by, cross-tab, and sub-totals. Data Mining and Knowledge Discovery, 1(1), 29-53. https://doi.org/10.1023/A:1009726021843",
+        "in_text": "(Gray et al., 1997)",
+        "year": 1997,
+        "doi": "https://doi.org/10.1023/A:1009726021843",
+        "verified_via": "Crossref",
+        "supports": "Defines the CUBE and ROLLUP aggregation operators that add sub-totals and a grand total to GROUP BY.",
+        "older_than_5y_reason": "Foundational: original paper defining ROLLUP/CUBE; no recent source searched that states it more directly.",
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=Data+cube%3A+A+relational+aggregation+operator+generalizing+group-by%2C+cross-tab%2C+and+sub-totals"
+      }
+    ],
+    "notes": "Verified via Crossref (DOI needs URL-encoding in the API call only).",
+    "main_session_decision": "Foundational 1997 paper (5-year exception)."
+  },
+  {
+    "slot": "C10",
+    "claim": "Occupancy is a core demand measure in hotel management",
+    "sources": [
+      {
+        "apa": "Vasić, V., Hristov-Stančić, B., & Zečević, B. (2022). Empirical modeling of hotel occupancy rate with dynamic panel data. Ekonomika preduzeća, 70(3-4), 240-253. https://doi.org/10.5937/ekopre2204240v",
+        "in_text": "(Vasić et al., 2022)",
+        "year": 2022,
+        "doi": "https://doi.org/10.5937/ekopre2204240v",
+        "verified_via": "Crossref",
+        "supports": "Abstract states that occupancy rate is one of the key indicators of hotel performance (Spanish hotel panel, 49 hotels, 12 years).",
+        "older_than_5y_reason": null,
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=Empirical+modeling+of+hotel+occupancy+rate+with+dynamic+panel+data"
+      }
+    ],
+    "notes": "Journal is a regional (Serbian) peer-reviewed economics journal, lower profile than IJHM. Claim wording 'demand measure' is looser than 'key indicator of hotel performance'; consider rewording to 'key performance indicator'. Alternative: Viverit et al. (2023), Int. J. Hospitality Management 111, 103455, doi 10.1016/j.ijhm.2023.103455 (hotel demand forecasting; abstract not checked for occupancy as KPI).",
+    "main_session_decision": "Optional; regional journal; reword to \"key indicator of hotel performance\"."
+  }
+]

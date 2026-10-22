@@ -6,11 +6,11 @@ M1 - Lim Qi Cai
 
 ### Strategy: duplicating foreign key attributes in a 1:* relationship
 
-M1 uses the denormalisation strategy "duplicating FK attributes in 1:* relationships to reduce joins", one of five strategies for speeding up frequent or critical transactions [CITE C1].
+M1 uses the denormalisation strategy "duplicating FK attributes in 1:* relationships to reduce joins", one of five strategies Connolly and Begg (2015) list for speeding up frequent or critical transactions.
 
 In RESERVATION 1:* STAY, a reservation belongs to one hotel and has one STAY row per room. Normalised, STAY has no hotel column, so any query that filters or groups stays by hotel must join RESERVATION. M1 copies `hotel_id` into STAY as a foreign key to HOTEL (`FK_STAY_HOTEL`).
 
-ROOM cannot supply the hotel for every stay, because `STAY.room_id` is NULL until a room is assigned (the third room in test 1). The textbook example of this strategy rests on the same reasoning: a property with no staff allocated cannot reach its branch through Staff, so the branch number is copied onto the property [CITE C1].
+ROOM cannot supply the hotel for every stay, because `STAY.room_id` is NULL until a room is assigned (the third room in test 1). The textbook example of this strategy rests on the same reasoning: a property with no staff allocated cannot reach its branch through Staff, so the branch number is copied onto the property (Connolly & Begg, 2015).
 
 ### Queries that benefit
 
@@ -45,7 +45,7 @@ The join to RESERVATION is gone. Query vii (occupancy) also groups room-nights s
 
 ### Cost and how it is controlled
 
-Denormalisation makes implementation more complex and speeds up retrievals while slowing down updates [CITE C1]. Here the cost is a transitive dependency: `stay_id -> reservation_id -> hotel_id`, so STAY is no longer in 3NF [CITE C2] and the copy can drift from `RESERVATION.hotel_id`. Two triggers keep it consistent:
+Denormalisation makes implementation more complex and speeds up retrievals while slowing down updates (Ajayi et al., 2025; Connolly & Begg, 2015). Here the cost is a transitive dependency: `stay_id -> reservation_id -> hotel_id`, so STAY is no longer in 3NF (Connolly & Begg, 2015) and the copy can drift from `RESERVATION.hotel_id`. Two triggers keep it consistent:
 
 | Trigger | Fires on | What it does |
 |---|---|---|
@@ -56,7 +56,7 @@ Denormalisation makes implementation more complex and speeds up retrievals while
 
 ### Why the denormalisation is justified
 
-Availability, most-booked category, occupancy and the overlap check all read STAY, so it is the table M1 reads most. The copy is written once when the stay is created and changes only if a reservation moves hotel. The triggers set it on every insert and update path, so no caller has to remember it (test 12a). With one write per stay against many reads, the trade-off of faster reads for slower updates [CITE C1] is worth taking.
+Availability, most-booked category, occupancy and the overlap check all read STAY, so it is the table M1 reads most. The copy is written once when the stay is created and changes only if a reservation moves hotel. The triggers set it on every insert and update path, so no caller has to remember it (test 12a). With one write per stay against many reads, the trade-off of faster reads for slower updates (Ajayi et al., 2025) is worth taking.
 
 ## 2. Constraint, stored procedure and trigger (Design 1c)
 
@@ -72,7 +72,7 @@ M1 - Lim Qi Cai
 | Definition | `CHECK (scheduled_checkout > scheduled_checkin)`, added `WITH CHECK` so existing rows are validated too. |
 | Error | SQL Server's CHECK constraint violation naming `CK_STAY_dates`; the INSERT or UPDATE is rejected (test 7). |
 
-A CHECK constraint is enough because the rule compares two columns of the same row [CITE C3].
+A CHECK constraint is enough because the rule compares two columns of the same row (Connolly & Begg, 2015).
 
 ### 2.2 Stored procedure: `usp_CreateReservation`
 
@@ -97,7 +97,7 @@ The procedure does not repeat the overlap check. That rule sits in the trigger, 
 |---|---|
 | Purpose | Stop double-booking a room. |
 | Business rules | (1) A room cannot be assigned to overlapping active stays. (2) A stay can only use a room of its reservation's hotel. |
-| Table and timing | STAY, AFTER INSERT, UPDATE. Returns at once unless `room_id`, `scheduled_checkin`, `scheduled_checkout`, `reservation_id` or `hotel_id` changed (`IF UPDATE(...)`) [CITE C4]. |
+| Table and timing | STAY, AFTER INSERT, UPDATE. Returns at once unless `room_id`, `scheduled_checkin`, `scheduled_checkout`, `reservation_id` or `hotel_id` changed (`IF UPDATE(...)`; Microsoft, n.d.-b). |
 | Rule 1 check | Joins `inserted` to RESERVATION, ROOM and HOTEL and looks for a room whose hotel differs from the reservation's hotel. |
 | Rule 2 check | Joins `inserted` to other STAY rows in the same room (`s.stay_id <> i.stay_id`) where neither reservation is Cancelled and `i.checkin < s.checkout AND s.checkin < i.checkout`. |
 | Errors | "Room %s (%s) is not a room of %s, the hotel of this reservation." or "Room %s at %s is already booked from %s to %s (stay %d)." followed by `ROLLBACK TRANSACTION`. |
@@ -106,9 +106,9 @@ The trigger works on the whole `inserted` set, so a multi-row INSERT is checked 
 
 Overlap is strict: a guest checking out at 12:00 and the next checking in at 14:00 the same day do not clash (test 4; reservations 1019 and 1020 in the test data).
 
-This rule has to be a trigger. A CHECK constraint can reference only the columns of the row it is defined on, so business rules that span rows or tables have to be enforced by triggers [CITE C3]. The overlap rule compares a new stay with other rows of STAY and reads the status from RESERVATION. The hotel rule reads ROOM and RESERVATION. A CHECK constraint can see neither.
+This rule has to be a trigger. A CHECK constraint can reference only the columns of the row it is defined on, so business rules that span rows or tables have to be enforced by triggers, which fire automatically when the data changes (Connolly & Begg, 2015; Paton & Díaz, 1999). The overlap rule compares a new stay with other rows of STAY and reads the status from RESERVATION. The hotel rule reads ROOM and RESERVATION. A CHECK constraint can see neither.
 
-Rolling back in an AFTER trigger is expensive, since the data is changed twice [CITE C4]. INSTEAD OF would avoid that, but a table allows only one INSTEAD OF trigger per action [CITE C4] and M4 and M5 also have triggers on STAY, so AFTER lets all of them run.
+An AFTER trigger runs once the rows are already written, so rejecting them means undoing work that has been done. INSTEAD OF would avoid that, but a table allows only one INSTEAD OF trigger per INSERT, UPDATE or DELETE (Microsoft, n.d.-b), and M4 and M5 also have triggers on STAY, so AFTER lets all of them run.
 
 A companion trigger, `trg_Reservation_NoOverlapOnReactivate` (AFTER UPDATE on RESERVATION), covers the one path `trg_Stay_NoOverlap` cannot see. A cancelled stay does not hold its room, so the room can be rebooked; if the cancelled reservation is later set back to an active status, its stays become active again without any STAY row changing. The trigger runs only when `status` changes from `Cancelled` to another value, applies the same overlap test to that reservation's stays, and rolls back with "Reservation %d cannot be re-activated" on a clash (tests 13a and 13b).
 
@@ -118,15 +118,15 @@ M1 - Lim Qi Cai
 
 M1's T-SQL feature is the stored procedure `usp_CreateReservation`. A booking writes to three tables: one RESERVATION row, one STAY row per room and one STAY_NIGHT row per night (test 1 writes 1, 3 and 7).
 
-The procedure wraps those writes in one transaction. Atomicity is the "all or nothing" property of a transaction: it is performed in its entirety or not at all [CITE C7]. If the second room of a booking clashes with another stay, the trigger rolls back and the first room's STAY row and the RESERVATION row are undone too. Test 2 checks that the RESERVATION row count is unchanged after a rejected booking, and test 10 checks the same for a booking with an unpriced night.
+The procedure wraps those writes in one transaction. Atomicity is the "all or nothing" property of a transaction: it is performed in its entirety or not at all (Haerder & Reuter, 1983). If the second room of a booking clashes with another stay, the trigger rolls back and the first room's STAY row and the RESERVATION row are undone too. Test 2 checks that the RESERVATION row count is unchanged after a rejected booking, and test 10 checks the same for a booking with an unpriced night.
 
 The table-valued parameter is what makes one call per booking possible. A scalar parameter list can only describe a fixed number of rooms, but the case study says a guest can book one or more rooms under a single reservation. `dbo.StayRequest` carries any number of rooms in one call, and the procedure inserts them with one set-based INSERT.
 
 | Alternative | Why M1 did not use it |
 |---|---|
-| The application sends the INSERTs itself | Every client would repeat the validation, pricing and transaction handling. Shared application logic, a hidden schema and less network traffic are the usual reasons for using procedures [CITE C5]. |
+| The application sends the INSERTs itself | Every client would repeat the validation, pricing and transaction handling. A stored procedure keeps that logic in one place in the database, and stored procedures can improve query performance and reduce security gaps at the interface level (Hartono & Erfina, 2021). |
 | One procedure call per room | Each call would be a separate transaction unless the caller wrapped them in one. If room 3 failed, rooms 1 and 2 would already be saved under a reservation the guest never completed, which breaks atomicity. |
-| A user-defined function | A function cannot insert into tables [CITE C6], so it cannot create the booking. Functions also cannot have output parameters [CITE C6], which the procedure uses to return `@reservation_id`, alongside a return code (0 success, 1 failure) the caller can branch on. |
+| A user-defined function | A user-defined function cannot modify database state (Microsoft, n.d.-a), so it cannot insert the booking. The CREATE FUNCTION syntax also has no OUTPUT option for parameters (Microsoft, n.d.-a), and an output parameter is what the procedure uses to return `@reservation_id`, alongside a return code (0 success, 1 failure) the caller can branch on. |
 
 ## 4. Testing summary
 
@@ -186,7 +186,7 @@ Counts stays per category at the hotel whose nights fall in the date range, and 
 
 ### v. Confirmed reservations by hotel and category with ROLLUP
 
-`GROUP BY ROLLUP (h.name, rc.category_name)` produces the detail rows, one subtotal per hotel and a grand total [CITE C9]. `GROUPING()` replaces the NULLs ROLLUP leaves in the summary rows with the labels "Hotel subtotal", "All hotels" and "Grand total", and the ORDER BY uses `GROUPING()` to put each subtotal after its hotel's rows and the grand total last.
+`GROUP BY ROLLUP (h.name, rc.category_name)` produces the detail rows, one subtotal per hotel and a grand total (Gray et al., 1997). `GROUPING()` replaces the NULLs ROLLUP leaves in the summary rows with the labels "Hotel subtotal", "All hotels" and "Grand total", and the ORDER BY uses `GROUPING()` to put each subtotal after its hotel's rows and the grand total last.
 
 The count is `COUNT(DISTINCT r.reservation_id)`. A reservation with rooms in two categories counts once in each category row but only once in its hotel subtotal; a plain `COUNT(*)` would count rooms, not reservations, and inflate the subtotals. ROLLUP was chosen over CUBE because the brief asks for hotel subtotals and a grand total, not category totals across hotels.
 
@@ -196,7 +196,7 @@ Selects from HOTEL with `NOT EXISTS` over confirmed stays that have at least one
 
 ### vii. Additional query: occupancy rate by hotel and month
 
-Occupancy is a core demand measure in hotel management [CITE C10]: it shows how much of each hotel's room capacity was sold in each month of the year. The formula used:
+Occupancy rate is a key indicator of hotel performance (Vasić et al., 2022). It shows how much of each hotel's room capacity was sold in each month of the year. The formula used:
 
 - occupancy % = room-nights sold / room-nights available x 100
 - room-nights sold = nights of active stays in the month, counted from STAY_NIGHT
@@ -220,13 +220,29 @@ Assumptions:
 Known limitations:
 
 - Overdue open maintenance keeps blocking the room with no end date. Queries i and vii compare `expected_end_date` with `GETDATE()`, so their results depend on the day they are run. Query i's result for room 202 changes after 30 Oct 2026.
-- Concurrency relies on SQL Server's default locking under READ COMMITTED. Exclusive locks are held until commit [CITE C8], so a second booking's trigger waits for the first booking's uncommitted STAY row. This was tested with two sessions booking room 102 for overlapping dates: the second booking waited about 6 seconds until the first committed, was then rejected as "already booked", and only one stay was saved (READ_COMMITTED_SNAPSHOT is off, the default). Locking does not prevent deadlocks [CITE C8], where SQL Server rolls one transaction back.
+- Concurrency relies on SQL Server's default locking under READ COMMITTED. In SQL Server, exclusive locks are held until the transaction commits, so a second booking's trigger waits for the first booking's uncommitted STAY row. This was tested with two sessions booking room 102 for overlapping dates: the second booking waited about 6 seconds until the first committed, was then rejected as "already booked", and only one stay was saved (READ_COMMITTED_SNAPSHOT is off, the default). Locking does not prevent deadlocks (Eswaran et al., 1976); when one occurs, SQL Server rolls one of the transactions back.
 - There is no index on `STAY.room_id`. The overlap trigger and query i search STAY by room, so a larger STAY table would need a non-clustered index on `STAY(room_id, scheduled_checkin, scheduled_checkout)`.
 - `STAY.hotel_id` is nullable (section 1), so only the triggers, not the column definition, guarantee it is filled.
 - The procedure accepts at most 60 nights per room. Its night generator builds up to 64 dates, so longer stays would need a larger generator.
 
 ## References
 
-Citations come from Google Scholar, not lecture slides. Each `[CITE Cn]` above is one slot; the search terms and how many sources each needs are in the citation tracker. Replace each placeholder with an APA 7 in-text citation and list the full references here, alphabetically.
+Ajayi, W., Okesola, K. I., Nteziryayo, D., Odo, C., & Akpan, U. (2025). Relational database normalization vs denormalization: A performance perceptive. *Asian Journal of Electrical Sciences, 14*(2), 53-66. https://doi.org/10.70112/ajes-2025.14.2.4291
 
-<!-- C1 denormalisation (2) | C2 normalisation/3NF (1) | C3 constraints vs triggers (1) | C4 SQL Server triggers (1, vendor docs?) | C5 stored procedures (1) | C6 SQL Server functions/TVPs (1, vendor docs?) | C7 atomicity/ACID (1) | C8 locking/deadlocks (1) | C9 ROLLUP/data cube (1, optional) | C10 hotel occupancy KPI (1, optional) -->
+Connolly, T., & Begg, C. (2015). *Database systems: A practical approach to design, implementation, and management* (6th ed.). Pearson.
+
+Eswaran, K. P., Gray, J. N., Lorie, R. A., & Traiger, I. L. (1976). The notions of consistency and predicate locks in a database system. *Communications of the ACM, 19*(11), 624-633. https://doi.org/10.1145/360363.360369
+
+Gray, J., Chaudhuri, S., Bosworth, A., Layman, A., Reichart, D., Venkatrao, M., Pellow, F., & Pirahesh, H. (1997). Data cube: A relational aggregation operator generalizing group-by, cross-tab, and sub-totals. *Data Mining and Knowledge Discovery, 1*(1), 29-53. https://doi.org/10.1023/A:1009726021843
+
+Haerder, T., & Reuter, A. (1983). Principles of transaction-oriented database recovery. *ACM Computing Surveys, 15*(4), 287-317. https://doi.org/10.1145/289.291
+
+Hartono, N., & Erfina, E. (2021). Comparison of stored procedures on relational database management system. *Tech-E, 4*(2), 8-15. https://doi.org/10.31253/te.v4i2.529
+
+Microsoft. (n.d.-a). *CREATE FUNCTION (Transact-SQL)*. Microsoft Learn. Retrieved October 22, 2026, from https://learn.microsoft.com/en-us/sql/t-sql/statements/create-function-transact-sql
+
+Microsoft. (n.d.-b). *CREATE TRIGGER (Transact-SQL)*. Microsoft Learn. Retrieved October 22, 2026, from https://learn.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql
+
+Paton, N. W., & Díaz, O. (1999). Active database systems. *ACM Computing Surveys, 31*(1), 63-103. https://doi.org/10.1145/311531.311623
+
+Vasić, V., Hristov-Stančić, B., & Zečević, B. (2022). Empirical modeling of hotel occupancy rate with dynamic panel data. *Ekonomika preduzeća, 70*(3-4), 240-253. https://doi.org/10.5937/ekopre2204240v
