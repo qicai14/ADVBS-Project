@@ -263,3 +263,37 @@ BEGIN CATCH
 END CATCH;
 IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
 GO
+
+/* ---------- Test 13: re-activating a cancelled reservation ----------
+   a) Reservation 1014 (Singapore room 201, 2-4 Jul 2026) was cancelled,
+      and checked-out reservation 1005 used the same room on 1-3 Jul.
+      Setting 1014 back to Confirmed would create an overlap: rejected.
+   b) Reservation 1012 (KL room 301, 1-3 May 2026) clashes with nothing,
+      so re-activating it is allowed. */
+BEGIN TRANSACTION;
+BEGIN TRY
+    UPDATE RESERVATION SET status = N'Confirmed' WHERE reservation_id = 1014;
+    PRINT 'FAIL 13a overlapping re-activation was accepted';
+END TRY
+BEGIN CATCH
+    IF ERROR_MESSAGE() LIKE '%cannot be re-activated%'
+        PRINT 'PASS 13a overlapping re-activation rejected: ' + ERROR_MESSAGE();
+    ELSE
+        PRINT 'FAIL 13a unexpected: ' + ERROR_MESSAGE();
+END CATCH;
+IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+GO
+
+BEGIN TRANSACTION;
+BEGIN TRY
+    UPDATE RESERVATION SET status = N'Confirmed' WHERE reservation_id = 1012;
+    IF (SELECT status FROM RESERVATION WHERE reservation_id = 1012) = N'Confirmed'
+        PRINT 'PASS 13b re-activation without a clash accepted';
+    ELSE
+        PRINT 'FAIL 13b status not changed';
+END TRY
+BEGIN CATCH
+    PRINT 'FAIL 13b rejected: ' + ERROR_MESSAGE();
+END CATCH;
+IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+GO
