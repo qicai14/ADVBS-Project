@@ -20,5 +20,8 @@ Ownership:
 
 Delegation (the main session plans, writes the SQL and reviews; agents in `.claude/agents/`):
 - `chore` (Haiku, low effort): searches, file listings, renames, moves, find-and-replace, running a script and reporting the output.
-- `doc-writer`: all report prose, so drafts stay out of the main context. Brief it with section, owner slot, sources and where to save.
+- `doc-writer`: all report prose, so drafts stay out of the main context. Brief it with section, owner slot, sources and where to save. It ends every draft with the academic-research-skills Writing Quality Check, then `humanizer` last.
+- `citation-researcher` (Sonnet): finds and verifies sources for `[CITE Cn]` slots; writes JSON only, never the report. Run one per group of slots, in parallel.
 - Everything needing judgement (design, SQL logic, reviewing results) stays in the main session.
+
+Plugins (project-enabled in `.claude/settings.json`; they load at session start): `academic-research-skills` (research, citations, writing quality) and `humanizer`.
