@@ -1,6 +1,6 @@
 # Status
 
-As of 2026-10-19.
+As of 2026-10-23.
 
 Done:
 - Design reviewed and fixed; group agreed to all fixes (`design/design-review.md`, `design/erd.md`, SVG exports in `design/`).
@@ -8,9 +8,10 @@ Done:
 - Report scaffold: `submissions/ADVBS Group Assignment - Documentation.docx` (headings, placeholders, all 35 queries, workload matrix, APA references).
 - `sql/01_tables.sql` (21 tables, keys, defaults) and `sql/02_data.sql` (test data; scenario list in its header). Both run clean on SQL Server 2022 CU27; every 1c CHECK constraint accepts the data.
 - Member folders `M1_…` to `M5_…` with starter files; team guide in `README.md`.
-- M1 objects, tests (13 PASS) and queries i–vii (branch `m1-reservations`, PR open).
+- M1 complete: objects, 16 tests (all PASS) and queries i–vii; report draft `M1_Reservations_Availability/M1_report.md` in the scaffold's numbering, with 10 verified citations (`M1_citations.json`).
+- Tooling: academic-research-skills and humanizer plugins (project settings); agents `chore`, `doc-writer`, `citation-researcher`.
 
-Next: each member builds their `M#_objects.sql` (constraint, optimisation, SP, trigger), then queries and tests.
+Next: M2, M4 and M5 build their `M#_objects.sql`, queries and tests. Lim copies the M1 sections into the OneDrive report and adds screenshots.
 
 Decided:
 - Lecturer: each of the 4 members picks one slot; the unpicked slot is dropped.
