@@ -47,3 +47,4 @@ Before each new piece of work: `git checkout main`, `git pull`, `git checkout m2
 ## Rules
 
 - SQL style: `docs/sql-conventions.md`. Report style: `docs/documentation-style.md`.
+- Using Claude Code? The repo turns on two plugins (`academic-research-skills`, `humanizer`). Accept the folder-trust prompt and they load in your next session; nothing to install.
