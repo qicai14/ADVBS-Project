@@ -110,6 +110,8 @@ This rule has to be a trigger. A CHECK constraint can reference only the columns
 
 Rolling back in an AFTER trigger is expensive, since the data is changed twice [CITE C4]. INSTEAD OF would avoid that, but a table allows only one INSTEAD OF trigger per action [CITE C4] and M4 and M5 also have triggers on STAY, so AFTER lets all of them run.
 
+A companion trigger, `trg_Reservation_NoOverlapOnReactivate` (AFTER UPDATE on RESERVATION), covers the one path `trg_Stay_NoOverlap` cannot see. A cancelled stay does not hold its room, so the room can be rebooked; if the cancelled reservation is later set back to an active status, its stays become active again without any STAY row changing. The trigger runs only when `status` changes from `Cancelled` to another value, applies the same overlap test to that reservation's stays, and rolls back with "Reservation %d cannot be re-activated" on a clash (tests 13a and 13b).
+
 ## 3. T-SQL feature justification (Implementation)
 
 M1 - Lim Qi Cai
@@ -130,7 +132,7 @@ The table-valued parameter is what makes one call per booking possible. A scalar
 
 M1 - Lim Qi Cai
 
-`M1_tests.sql` runs 13 checks, each in its own transaction that is always rolled back, so the shared test data does not change. Each prints PASS or FAIL. Prices use the Kuala Lumpur Flexible rates from 1 July 2026: Standard RM 275.00, Deluxe RM 418.00, Family RM 572.00 per night.
+`M1_tests.sql` runs 15 checks, each in its own transaction that is always rolled back, so the shared test data does not change. Each prints PASS or FAIL. Prices use the Kuala Lumpur Flexible rates from 1 July 2026: Standard RM 275.00, Deluxe RM 418.00, Family RM 572.00 per night.
 
 | # | Scenario | Object tested | Expected outcome |
 |---|---|---|---|
@@ -147,6 +149,8 @@ M1 - Lim Qi Cai
 | 11 | Wrong-hotel room, wrong category, accessible request on a non-accessible room | Procedure input checks | Three separate rejections, each with its own message |
 | 12a | Insert a stay without `hotel_id` | `trg_Stay_SyncHotel` | `hotel_id` set to 1 automatically |
 | 12b | Move reservation 1019 to Singapore | `trg_Reservation_SyncStayHotel` then overlap trigger | Rejected because its assigned room is in Kuala Lumpur |
+| 13a | Set cancelled reservation 1014 back to Confirmed while 1005 used the same room | `trg_Reservation_NoOverlapOnReactivate` | Rejected as "cannot be re-activated" |
+| 13b | Set cancelled reservation 1012 back to Confirmed (no clash) | `trg_Reservation_NoOverlapOnReactivate` | Allowed |
 
 Tests 2, 8 and 10 also compare row counts before and after, which shows that nothing was saved.
 
@@ -216,7 +220,6 @@ Assumptions:
 Known limitations:
 
 - Overdue open maintenance keeps blocking the room with no end date. Queries i and vii compare `expected_end_date` with `GETDATE()`, so their results depend on the day they are run. Query i's result for room 202 changes after 30 Oct 2026.
-- Re-activating a cancelled reservation (changing RESERVATION.status from Cancelled back to an active status) is not re-checked for overlaps. `trg_Stay_NoOverlap` fires on STAY changes, and a status change touches only RESERVATION. A trigger on `RESERVATION.status` would close this gap.
 - Concurrency relies on SQL Server's default locking under READ COMMITTED. Exclusive locks are held until commit [CITE C8], so a second booking's trigger waits for the first booking's uncommitted STAY row. This was tested with two sessions booking room 102 for overlapping dates: the second booking waited about 6 seconds until the first committed, was then rejected as "already booked", and only one stay was saved (READ_COMMITTED_SNAPSHOT is off, the default). Locking does not prevent deadlocks [CITE C8], where SQL Server rolls one transaction back.
 - There is no index on `STAY.room_id`. The overlap trigger and query i search STAY by room, so a larger STAY table would need a non-clustered index on `STAY(room_id, scheduled_checkin, scheduled_checkout)`.
 - `STAY.hotel_id` is nullable (section 1), so only the triggers, not the column definition, guarantee it is filled.
