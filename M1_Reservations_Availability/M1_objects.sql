@@ -310,3 +310,56 @@ BEGIN
     END;
 END;
 GO
+
+/* =====================================================================
+   5. Trigger (M1): trg_Reservation_NoOverlapOnReactivate
+   Business rule: same as trg_Stay_NoOverlap. A cancelled stay does not
+   hold its room, so another guest may book it. If the cancelled
+   reservation is later set back to Pending, Confirmed or another active
+   status, its stays become active again without any STAY row changing,
+   so trg_Stay_NoOverlap never fires. This trigger closes that gap.
+   Fires: AFTER UPDATE on RESERVATION, only when status changes, and
+   checks only reservations moving from 'Cancelled' to another status.
+   Works on the whole inserted/deleted set; because it is AFTER, two
+   reservations re-activated in one statement are checked against each
+   other too. Maintenance clashes on re-activation are M5's rule.
+   On violation: RAISERROR + ROLLBACK TRANSACTION (W6 pattern).
+   ===================================================================== */
+
+CREATE OR ALTER TRIGGER trg_Reservation_NoOverlapOnReactivate
+ON RESERVATION
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF NOT UPDATE(status) RETURN;
+
+    DECLARE @reservation INT, @room_no NVARCHAR(10), @hotel NVARCHAR(100),
+            @other_stay INT, @from VARCHAR(16), @to VARCHAR(16);
+
+    SELECT TOP (1) @reservation = i.reservation_id, @room_no = rm.room_no, @hotel = h.name,
+                   @other_stay = s2.stay_id,
+                   @from = CONVERT(VARCHAR(16), s2.scheduled_checkin, 120),
+                   @to   = CONVERT(VARCHAR(16), s2.scheduled_checkout, 120)
+    FROM   inserted i
+    JOIN   deleted d      ON d.reservation_id = i.reservation_id
+    JOIN   STAY s1        ON s1.reservation_id = i.reservation_id
+    JOIN   STAY s2        ON s2.room_id = s1.room_id AND s2.stay_id <> s1.stay_id
+    JOIN   RESERVATION r2 ON r2.reservation_id = s2.reservation_id
+    JOIN   ROOM rm        ON rm.room_id = s1.room_id
+    JOIN   HOTEL h        ON h.hotel_id = rm.hotel_id
+    WHERE  d.status = N'Cancelled'
+      AND  i.status <> N'Cancelled'
+      AND  r2.status <> N'Cancelled'
+      AND  s1.scheduled_checkin < s2.scheduled_checkout
+      AND  s2.scheduled_checkin < s1.scheduled_checkout;
+
+    IF @other_stay IS NOT NULL
+    BEGIN
+        RAISERROR('Reservation %d cannot be re-activated: room %s at %s is already booked from %s to %s (stay %d).',
+                  16, 1, @reservation, @room_no, @hotel, @from, @to, @other_stay);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END;
+END;
+GO
