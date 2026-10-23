@@ -112,10 +112,21 @@
         "older_than_5y_reason": null,
         "vendor_fallback": false,
         "scholar_link": "https://scholar.google.com/scholar?q=Comparison+of+Stored+Procedures+on+Relational+Database+Management+System"
+      },
+      {
+        "apa": "Hu, G., Wang, Z., Tang, C., Shen, J., Dong, Z., Yao, S., & Chen, H. (2024). WeBridge: Synthesizing stored procedures for large-scale real-world web applications. Proceedings of the ACM on Management of Data, 2(1), 1-29. https://doi.org/10.1145/3639319",
+        "in_text": "(Hu et al., 2024)",
+        "year": 2024,
+        "doi": "https://doi.org/10.1145/3639319",
+        "verified_via": "Crossref + OpenAlex",
+        "supports": "Performance part only: abstract says stored procedures cut application-database network round trips and latency (up to 79.8% median latency reduction reported). Does not cover centralised logic or security.",
+        "older_than_5y_reason": null,
+        "vendor_fallback": false,
+        "scholar_link": "https://scholar.google.com/scholar?q=WeBridge%3A+Synthesizing+Stored+Procedures+for+Large-Scale+Real-World+Web+Applications"
       }
     ],
     "notes": "Only verified from the abstract (full text not read). Modest venue (Indonesian journal Tech-E), experimental on MariaDB/PostgreSQL, not SQL Server. Does not mention network traffic. If Lim wants stronger support, a textbook (e.g. Coronel & Morris, Database Systems) would cover all three; Crossref could not verify it, so not included.",
-    "main_session_decision": "Weak source (MariaDB/PostgreSQL study); \"less network traffic\" not supported, reword."
+    "main_session_decision": "Weak source (MariaDB/PostgreSQL study); \"less network traffic\" not supported, reword. Upgraded (23 Oct): added Hu et al. (2024, PACMMOD) for the performance point (fewer network round trips); Hartono & Erfina kept for logic/security."
   },
   {
     "slot": "C6",
@@ -199,18 +210,18 @@
     "claim": "Occupancy is a core demand measure in hotel management",
     "sources": [
       {
-        "apa": "Vasić, V., Hristov-Stančić, B., & Zečević, B. (2022). Empirical modeling of hotel occupancy rate with dynamic panel data. Ekonomika preduzeća, 70(3-4), 240-253. https://doi.org/10.5937/ekopre2204240v",
-        "in_text": "(Vasić et al., 2022)",
-        "year": 2022,
-        "doi": "https://doi.org/10.5937/ekopre2204240v",
-        "verified_via": "Crossref",
-        "supports": "Abstract states that occupancy rate is one of the key indicators of hotel performance (Spanish hotel panel, 49 hotels, 12 years).",
+        "apa": "Pereira-Moliner, J., Molina-Azorín, J. F., Tarí, J. J., López-Gamero, M. D., & Pertursa-Ortega, E. M. (2021). How do dynamic capabilities explain hotel performance? International Journal of Hospitality Management, 98, Article 103023. https://doi.org/10.1016/j.ijhm.2021.103023",
+        "in_text": "(Pereira-Moliner et al., 2021)",
+        "year": 2021,
+        "doi": "https://doi.org/10.1016/j.ijhm.2021.103023",
+        "verified_via": "Crossref + OpenAlex (abstract from OpenAlex)",
+        "supports": "Abstract: hotel performance is measured by occupancy rate, ADR and RevPAR. Names occupancy rate as a performance measure, does not say 'key'. Diacritics in author names (Molina-Azorin, Tari, Lopez-Gamero, Pertusa-Ortega) to be restored in the final reference.",
         "older_than_5y_reason": null,
         "vendor_fallback": false,
-        "scholar_link": "https://scholar.google.com/scholar?q=Empirical+modeling+of+hotel+occupancy+rate+with+dynamic+panel+data"
+        "scholar_link": "https://scholar.google.com/scholar?q=How+do+dynamic+capabilities+explain+hotel+performance%3F"
       }
     ],
     "notes": "Journal is a regional (Serbian) peer-reviewed economics journal, lower profile than IJHM. Claim wording 'demand measure' is looser than 'key indicator of hotel performance'; consider rewording to 'key performance indicator'. Alternative: Viverit et al. (2023), Int. J. Hospitality Management 111, 103455, doi 10.1016/j.ijhm.2023.103455 (hotel demand forecasting; abstract not checked for occupancy as KPI).",
-    "main_session_decision": "Optional; regional journal; reword to \"key indicator of hotel performance\"."
+    "main_session_decision": "Upgraded (23 Oct): replaced Vasic et al. (2022) with Pereira-Moliner et al. (2021, IJHM); sentence reworded to \"one of the standard measures of hotel performance\" to match the abstract."
   }
 ]

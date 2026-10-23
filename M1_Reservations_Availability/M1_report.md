@@ -394,7 +394,7 @@ The table-valued parameter makes one call per booking possible. A list of scalar
 
 | Alternative | Why M1 did not use it |
 |---|---|
-| The application sends the INSERTs itself | Every client would repeat the validation, pricing and transaction handling. A stored procedure keeps that logic in one place in the database, and stored procedures can improve query performance and reduce security gaps at the interface level (Hartono & Erfina, 2021). |
+| The application sends the INSERTs itself | Every client would repeat the validation, pricing and transaction handling. A stored procedure keeps that logic in one place in the database, and stored procedures can improve query performance and reduce security gaps at the interface level (Hartono & Erfina, 2021). Running the logic inside the database also saves network round trips between the application and the server, which lowers latency (Hu et al., 2024). |
 | One procedure call per room | Each call would be a separate transaction unless the caller wrapped them in one. If room 3 failed, rooms 1 and 2 would already be saved under a reservation the guest never completed, which breaks atomicity. |
 | A user-defined function | A user-defined function cannot modify database state (Microsoft, n.d.-a), so it cannot insert the booking. The CREATE FUNCTION syntax also has no OUTPUT option for parameters (Microsoft, n.d.-a). The procedure uses an output parameter to return `@reservation_id`, alongside a return code (0 success, 1 failure) that the caller can branch on. |
 
@@ -601,7 +601,7 @@ The query selects from HOTEL with `NOT EXISTS` over confirmed stays that have at
 
 **(vii)** Additional query: reservation demand.
 
-M1's additional query reports the occupancy rate by hotel and month for a year. Occupancy rate is a key indicator of hotel performance (Vasić et al., 2022). It shows how much of each hotel's room capacity was sold in each month.
+M1's additional query reports the occupancy rate by hotel and month for a year. Occupancy rate is one of the standard measures of hotel performance, alongside average daily rate and revenue per available room (Pereira-Moliner et al., 2021). It shows how much of each hotel's room capacity was sold in each month.
 
 ```sql
 DECLARE @year INT = 2026;
@@ -728,10 +728,12 @@ Haerder, T., & Reuter, A. (1983). Principles of transaction-oriented database re
 
 Hartono, N., & Erfina, E. (2021). Comparison of stored procedures on relational database management system. *Tech-E, 4*(2), 8-15. https://doi.org/10.31253/te.v4i2.529
 
+Hu, G., Wang, Z., Tang, C., Shen, J., Dong, Z., Yao, S., & Chen, H. (2024). WeBridge: Synthesizing stored procedures for large-scale real-world web applications. *Proceedings of the ACM on Management of Data, 2*(1), 1-29. https://doi.org/10.1145/3639319
+
 Microsoft. (n.d.-a). *CREATE FUNCTION (Transact-SQL)*. Microsoft Learn. Retrieved October 22, 2026, from https://learn.microsoft.com/en-us/sql/t-sql/statements/create-function-transact-sql
 
 Microsoft. (n.d.-b). *CREATE TRIGGER (Transact-SQL)*. Microsoft Learn. Retrieved October 22, 2026, from https://learn.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql
 
 Paton, N. W., & Díaz, O. (1999). Active database systems. *ACM Computing Surveys, 31*(1), 63-103. https://doi.org/10.1145/311531.311623
 
-Vasić, V., Hristov-Stančić, B., & Zečević, B. (2022). Empirical modeling of hotel occupancy rate with dynamic panel data. *Ekonomika preduzeća, 70*(3-4), 240-253. https://doi.org/10.5937/ekopre2204240v
+Pereira-Moliner, J., Molina-Azorín, J. F., Tarí, J. J., López-Gamero, M. D., & Pertursa-Ortega, E. M. (2021). How do dynamic capabilities explain hotel performance? *International Journal of Hospitality Management, 98*, Article 103023. https://doi.org/10.1016/j.ijhm.2021.103023
